@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mymemory_translate/mymemory_translate.dart';
+import 'package:mymemory_translate/utils/errors.dart';
 
 import 'mymemory_translate_test.mocks.dart';
 
@@ -61,7 +62,6 @@ void main() {
   });
 
   test('new memory translate object', () {
-    expect(myMemoryTranslate.httpClient, isA<http.Client>());
     expect(myMemoryTranslate.key, null);
     expect(myMemoryTranslate.email, null);
   });
@@ -99,32 +99,37 @@ void main() {
     expect(result.matches[0].match, 1.0);
   });
 
-  test('invalid language response', () async {
+  test('invalid language response throws exception', () async {
     when(httpClient.get(any)).thenAnswer(
         (inv) => Future.value(http.Response(languageMissingResponse, 200)));
 
-    var result = await myMemoryTranslate.translate('Hello', 'en-us', 'il');
-
-    expect(result.responseData.translatedText,
-        '\'IL\' IS AN INVALID TARGET LANGUAGE . EXAMPLE: LANGPAIR=EN|IT USING 2 LETTER ISO OR RFC3066 LIKE ZH-CN. ALMOST ALL LANGUAGES SUPPORTED BUT SOME MAY HAVE NO CONTENT');
-    expect(result.responseData.match, null);
-    expect(result.quotaFinished, null);
-    expect(result.mtLangSupport, null);
-    expect(result.responseDetails,
-        '\'IL\' IS AN INVALID TARGET LANGUAGE . EXAMPLE: LANGPAIR=EN|IT USING 2 LETTER ISO OR RFC3066 LIKE ZH-CN. ALMOST ALL LANGUAGES SUPPORTED BUT SOME MAY HAVE NO CONTENT');
-    expect(result.responseStatus, 403);
-    expect(result.responderId, null);
-    expect(result.exceptionCode, null);
-    expect(result.matches.length, 0);
+    expect(
+      () async => await myMemoryTranslate.translate('Hello', 'en-us', 'il'),
+      throwsA(isA<TranslationApiException>()),
+    );
   });
 
-  test('connection failed', () async {
+  test('empty string throws error', () async {
+    expect(
+      () async => await myMemoryTranslate.translate('', 'en-us', 'il'),
+      throwsA(isA<EmptyStringError>()),
+    );
+  });
+
+  test('non-200 status throws exception', () async {
+    expect(
+      () async => await myMemoryTranslate.translate('Hello', 'en-us', 'il'),
+      throwsA(isA<TranslationApiException>()),
+    );
+  });
+
+  test('connection failed', () {
     when(httpClient.get(any))
         .thenThrow(http.ClientException("Connection failed"));
 
     expect(
       () async => await myMemoryTranslate.translate('Hello', 'en-us', 'il'),
-      throwsException,
+      throwsA(isA<http.ClientException>()),
     );
   });
 }
