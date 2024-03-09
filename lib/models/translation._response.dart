@@ -1,8 +1,9 @@
-import 'package:mymemory_translate/models/response_data.dart';
 import 'package:mymemory_translate/models/translation_match.dart';
+import 'package:mymemory_translate/models/translation_response_data.dart';
 
+/// The response data returned from translating text.
 class TranslationResponse {
-  final ResponseData responseData;
+  final TranslationResponseData responseData;
   final bool? quotaFinished;
   final bool? mtLangSupport;
   final String responseDetails;
@@ -24,7 +25,7 @@ class TranslationResponse {
 
   factory TranslationResponse.fromJson(Map<String, dynamic> json) {
     return TranslationResponse(
-      ResponseData.fromJson(json['responseData']),
+      TranslationResponseData.fromJson(json['responseData']),
       json['quotaFinished'],
       json['mtLangSupport'],
       json['responseDetails'],

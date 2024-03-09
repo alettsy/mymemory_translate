@@ -1,3 +1,4 @@
+/// Data about a potential match for a translation.
 class TranslationMatch {
   final String id;
   final String segment;
