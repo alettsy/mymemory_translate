@@ -4,10 +4,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:mymemory_translate/models/translation._response.dart';
-import 'package:mymemory_translate/utils/errors.dart';
 
 import 'models/import_response_data.dart';
+import 'models/translation._response.dart';
+import 'utils/errors.dart';
 
 const String _baseUrl = "https://api.mymemory.translated.net";
 
@@ -210,14 +210,14 @@ class MyMemoryTranslate {
       Uri? sourceUrl,
       Uri? targetUrl}) async {
     if (private && key == null) {
-      throw TranslationApiException(
-          "cannot use private key because it is null");
+      throw TranslationApiException("cannot use key because it is null");
     }
 
     var request =
         http.MultipartRequest('POST', Uri.parse('$_baseUrl/v2/import'));
+
     request.files
-        .add(http.MultipartFile.fromString('file', file.readAsStringSync()));
+        .add(http.MultipartFile.fromBytes('file', file.readAsBytesSync()));
 
     if (name != null) request.fields['name'] = name;
     if (subject != null) request.fields['subj'] = subject;

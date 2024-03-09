@@ -1,5 +1,5 @@
-import 'package:mymemory_translate/models/translation_match.dart';
-import 'package:mymemory_translate/models/translation_response_data.dart';
+import 'translation_match.dart';
+import 'translation_response_data.dart';
 
 /// The response data returned from translating text.
 class TranslationResponse {
