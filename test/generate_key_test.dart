@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:mymemory_translate/mymemory_translate.dart';
 import 'package:mymemory_translate/utils/errors.dart';
+import 'package:test/test.dart';
 
 import 'mymemory_translate_test.mocks.dart';
 

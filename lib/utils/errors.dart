@@ -1,16 +1,21 @@
-import 'package:flutter/material.dart';
+class EmptyStringError extends Error {
+  final String message;
 
-class EmptyStringError extends ErrorDescription {
-  EmptyStringError(super.message);
-}
-
-class TranslationApiException implements Exception {
-  final String error;
-
-  TranslationApiException(this.error);
+  EmptyStringError(this.message);
 
   @override
   String toString() {
-    return 'TranslationApiException(error: $error)';
+    return 'EmptyStringError(message: $message)';
+  }
+}
+
+class TranslationApiException implements Exception {
+  final String message;
+
+  TranslationApiException(this.message);
+
+  @override
+  String toString() {
+    return 'TranslationApiException(message: $message)';
   }
 }
