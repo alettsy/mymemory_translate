@@ -1,12 +1,12 @@
 library mymemory_translate;
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:mymemory_translate/models/translation._response.dart';
 import 'package:mymemory_translate/utils/errors.dart';
 
-/// The base path of the MyMemory translation API.
 const String _baseUrl = "https://api.mymemory.translated.net";
 
 /// A simple API to communicate with the [MyMemory](https://mymemory.translated.net)
@@ -14,11 +14,10 @@ const String _baseUrl = "https://api.mymemory.translated.net";
 ///
 /// The API spec can be found [here](https://mymemory.translated.net/doc/spec.php).
 class MyMemoryTranslate {
-  /// The HTTP client used to make the GET requests to the API.
   final http.Client _httpClient;
 
   /// A unique [key] generated from your username and password  by using the
-  /// [keygen] function. You can use it to access your private glossary, by
+  /// [generateKey] function. You can use it to access your private glossary, by
   /// utilizing the [translate], [setTranslation], and [importTranslations]
   /// functions.
   String? key;
@@ -29,19 +28,18 @@ class MyMemoryTranslate {
 
   MyMemoryTranslate(this._httpClient, {this.key, this.email});
 
-  /// [translate] the [text] string [from] one language [to] another.
+  /// Gets the translated [text] input [from] one language [to] another.
   ///
   /// Set [onlyPrivate] to `true` to access your private glossary. A [key] is
   /// required to access your private glossary, which can be generated using the
-  /// [keygen] function.
+  /// [generateKey] function.
   ///
   /// An [ip] address can be provided for high volume usage.
   ///
-  /// If [text], [from], or [to] are empty strings, then an [EmptyStringError]
-  /// will be thrown.
+  /// Throws an [EmptyStringError] if [text], [from], or [to] are empty strings.
   ///
-  /// If the status code from the API is not 200, a [TranslationApiException]
-  /// is thrown.
+  /// Throws a [TranslationApiException] if the API returns an error or the
+  /// response status code is not 200.
   Future<TranslationResponse> translate(String text, String from, String to,
       {bool useMachineTranslation = true,
       bool onlyPrivate = false,
@@ -52,7 +50,7 @@ class MyMemoryTranslate {
     }
 
     var url =
-        '$_baseUrl/get?q=$text&langpair=$from|$to&mt=${useMachineTranslation as int}&onlyprivate=${onlyPrivate as int}';
+        '$_baseUrl/get?q=$text&langpair=$from|$to&mt=${_boolToInt(useMachineTranslation)}&onlyprivate=${_boolToInt(onlyPrivate)}';
 
     if (ip != null) '$url&ip=$ip';
     if (key != null) '$url&key=$key';
@@ -73,14 +71,14 @@ class MyMemoryTranslate {
     return result;
   }
 
-  /// Generate the [key] using a [username] and [password].
+  /// Generates a [key] using a [username] and [password].
   ///
-  /// If [username] or [password] are empty strings, then an [EmptyStringError]
-  /// is thrown.
+  /// Throws an [EmptyStringError] if [username] or [password] are empty
+  /// strings.
   ///
-  /// If the status code from the API is not 200, a [TranslationApiException]
-  /// is thrown.
-  Future<String> keygen(String username, String password) async {
+  /// Throws a [TranslationApiException] if the API returns an error or the
+  /// response status code is not 200.
+  Future<String> generateKey(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
       throw EmptyStringError(
           "'username' and 'password' cannot be empty strings");
@@ -90,9 +88,13 @@ class MyMemoryTranslate {
 
     var response = await _httpClient.get(Uri.parse(url));
 
-    var json = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      throw TranslationApiException(response.body);
+    }
 
-    if (json['responseStatus'].toString() != "200") {
+    Map<String, dynamic> json = jsonDecode(response.body);
+
+    if (json.containsKey('responseDetails')) {
       throw TranslationApiException(json['responseDetails']);
     }
 
@@ -106,11 +108,11 @@ class MyMemoryTranslate {
   /// Set the translated text [from] the [source], [to] the [target].
   ///
   /// If [useKey] is `true` then the translation will only be set in your
-  /// private glossary.
+  /// private glossary. Otherwise, it's visible to everyone.
   ///
-  /// If [source], [target], [to], or [from] are empty strings, then an
-  /// [EmptyStringError] is thrown.
-  Future<bool> setTranslation(
+  /// Throws a [TranslationApiException] if the API returns an error or the
+  /// response status code is not 200.
+  Future<String> setTranslation(
       String source, String target, String from, String to,
       {bool useKey = false}) async {
     if (useKey && key == null) {
@@ -129,12 +131,59 @@ class MyMemoryTranslate {
 
     var response = await _httpClient.get(Uri.parse(url));
 
-    // TODO: check actual response and return accordingly
+    if (response.statusCode != 200) {
+      throw TranslationApiException(response.body);
+    }
 
-    return response.statusCode == 200;
+    var json = jsonDecode(response.body);
+
+    if (int.parse(json['responseStatus'].toString()) != 200) {
+      throw TranslationApiException(json['responseDetails']);
+    }
+
+    return json['responseDetails'][0];
   }
 
-  // TODO: status
-  // TODO: import
-  // TODO: subjects
+  /// Gets the current import status of a TM import with the given [uuid].
+  ///
+  /// Throws an [EmptyStringError] if `uuid` is an empty string.
+  ///
+  /// Throws a [TranslationApiException] if the API returns an error or the
+  /// response status code is not 200.
+  Future<String> getImportStatus(String uuid) async {
+    if (uuid.isEmpty) {
+      throw EmptyStringError("'uuid' cannot be an empty string");
+    }
+
+    var url = '$_baseUrl/v2/import/status?uuid=$uuid';
+
+    var response = await _httpClient.get(Uri.parse(url));
+
+    if (response.statusCode != 200) {
+      throw TranslationApiException(response.body);
+    }
+
+    var json = jsonDecode(response.body);
+
+    if (int.parse(json['responseStatus'].toString()) != 200) {
+      throw TranslationApiException('UUID not found');
+    }
+
+    // TODO: find proper return value
+    return 'unimplemented';
+  }
+
+  // TODO: multipart/form-data, not get
+  Future<bool> importTranslations(File file,
+      {String? name,
+      String? subject,
+      bool private = false,
+      Uri? sourceUrl,
+      Uri? targetUrl}) async {
+    throw UnimplementedError();
+  }
+
+  int _boolToInt(bool value) {
+    return value ? 1 : 0;
+  }
 }

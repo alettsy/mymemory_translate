@@ -8,7 +8,7 @@ import 'package:mymemory_translate/utils/errors.dart';
 
 import 'mymemory_translate_test.mocks.dart';
 
-var successResponse = jsonEncode(<String, dynamic>{
+var successResponse = jsonEncode({
   "responseData": {"translatedText": "Hola", "match": 1.0},
   "quotaFinished": false,
   "mtLangSupported": null,
@@ -36,7 +36,7 @@ var successResponse = jsonEncode(<String, dynamic>{
   ]
 });
 
-var languageMissingResponse = jsonEncode(<String, dynamic>{
+var languageMissingResponse = jsonEncode({
   "responseData": {
     "translatedText":
         "'IL' IS AN INVALID TARGET LANGUAGE . EXAMPLE: LANGPAIR=EN|IT USING 2 LETTER ISO OR RFC3066 LIKE ZH-CN. ALMOST ALL LANGUAGES SUPPORTED BUT SOME MAY HAVE NO CONTENT"
@@ -51,9 +51,7 @@ var languageMissingResponse = jsonEncode(<String, dynamic>{
   "matches": ""
 });
 
-// TODO: test invalid email provided
-// TODO: test invalid key provided
-void translateTests() {
+void main() {
   MockClient httpClient = MockClient();
   late MyMemoryTranslate myMemoryTranslate;
 
@@ -70,7 +68,7 @@ void translateTests() {
     when(httpClient.get(any))
         .thenAnswer((inv) => Future.value(http.Response(successResponse, 200)));
 
-    // IP parameter added for test coverage only
+    // ip parameter added for test coverage only
     var result = await myMemoryTranslate.translate('Hello', 'en-us', 'es',
         ip: '0.0.0.0');
 
@@ -123,7 +121,7 @@ void translateTests() {
     );
   });
 
-  test('connection failed', () {
+  test('connection error throws exception', () {
     when(httpClient.get(any))
         .thenThrow(http.ClientException("Connection failed"));
 
