@@ -2,6 +2,7 @@ name: mymemory_translate
 description: "A simple translator using the MyMemory translation API."
 version: 0.0.1
 homepage:
+repository: https://github.com/alettsy/mymemory_translate
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
