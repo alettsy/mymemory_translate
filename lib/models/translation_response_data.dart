@@ -8,7 +8,7 @@ class TranslationResponseData {
   factory TranslationResponseData.fromJson(Map<String, dynamic> json) {
     return TranslationResponseData(
       json['translatedText'],
-      json['match'],
+      double.parse(json['match'].toString()),
     );
   }
 }

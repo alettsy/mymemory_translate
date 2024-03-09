@@ -39,7 +39,7 @@ class TranslationMatch {
       json['translation'],
       json['source'],
       json['target'],
-      json['quality'],
+      json['quality'].toString(),
       json['reference'],
       json['usage-count'],
       json['subject'],
@@ -47,7 +47,7 @@ class TranslationMatch {
       json['last-updated-by'],
       json['create-date'],
       json['last-update-date'],
-      json['match'],
+      double.parse(json['match'].toString()),
     );
   }
 }
