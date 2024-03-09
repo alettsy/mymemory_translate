@@ -12,15 +12,65 @@ In your Flutter project add the dependency:
 
 ```yaml
 dependencies:
-    ...
-    mymemory_translate:
+    mymemory_translate: ^1.0.0
 ```
 
 or run `flutter pub add mymemory_translate`.
 
 ## Usage Examples
 
-TODO: usage examples
+### Translating
+
+```dart
+void main() async {
+  
+  // Create a new translator without a key or email
+  var translator = MyMemoryTranslator(http.Client);
+  
+  // Translate "Hello" from English to German
+  var result = await translator.translate('Hello', 'en-us', 'de');
+  
+  // Prints "Hallo"
+  print(result);
+  
+  // You can set your email to get 50,000 characters per day
+  // instead of only 5,000.
+  translator.email = "email@email.com";
+}
+```
+
+### Generate API Key
+
+```dart
+void main() async {
+
+  // Create a new translator without a key or email
+  var translator = MyMemoryTranslator(http.Client);
+  
+  // Generate the API key with my username and password
+  await translator.generateKey('myusername', 'mypassword');
+  print(translator.key);
+  
+  // Now you can access your private glossary
+  // For example, to get translations only from your private glossary
+  var result = await translator.translate('Hello', 'en-us', 'de', onlyPrivate: true);
+
+  // Or to set a translation in your private glossary
+  await translator.setTranslation('Hello', 'Hallo', 'en-us', 'de', useKey: true);
+}
+```
+
+### Set Translations
+```dart
+void main() async {
+
+  // Create a new translator without a key or email
+  var translator = MyMemoryTranslator(http.Client);
+  
+  // Set "Hello" to "Hallo" from English to German
+  await translator.setTranslation('Hello', 'Hallo', 'en-us', 'de');
+}
+```
 
 ## Languages
 
