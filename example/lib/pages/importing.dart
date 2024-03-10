@@ -105,7 +105,7 @@ class _GetTranslationState extends State<Importing> {
     var exampleFile = File('example.tmx');
     exampleFile.writeAsString(_tmxContent);
 
-    var response = await translator.importTranslationMemoryFile(exampleFile);
+    // var response = await translator.importTranslationMemoryFile(exampleFile);
 
     setState(() {
       loadingImport = false;
