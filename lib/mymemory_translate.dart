@@ -1,7 +1,6 @@
 library mymemory_translate;
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
@@ -208,47 +207,47 @@ class MyMemoryTranslate {
   ///
   /// Throws a [TranslationApiException] if [private] is `true` and [key] is
   /// `null`.
-  Future<bool> importTranslationMemoryFile(File file,
-      {String? name,
-      String? subject,
-      bool private = false,
-      Uri? sourceUrl,
-      Uri? targetUrl}) async {
-    if (private && key == null) {
-      throw TranslationApiException("cannot use key because it is null");
-    }
-
-    var request =
-        http.MultipartRequest('POST', Uri.parse('$_baseUrl/v2/tmx/import'));
-
-    request.files
-        .add(http.MultipartFile.fromBytes('tmx', file.readAsBytesSync()));
-
-    if (name != null) request.fields['name'] = name;
-    if (subject != null) request.fields['subj'] = subject;
-    if (sourceUrl != null) request.fields['surl'] = sourceUrl.toString();
-    if (targetUrl != null) request.fields['turl'] = targetUrl.toString();
-    if (key != null) request.fields['key'] = key!;
-    request.fields['private'] = _boolToInt(private).toString();
-
-    request.headers['Content-Type'] = 'multipart/form-data';
-
-    var sent = await request.send();
-    var response = await http.Response.fromStream(sent);
-
-    if (response.statusCode != 200) {
-      throw TranslationApiException('invalid request - ${response.body}');
-    }
-
-    var json = jsonDecode(response.body);
-
-    if (json['responseStatus'] != 200) {
-      throw TranslationApiException(json['responseDetails']);
-    }
-
-    // Should return a valid UUID, but response is empty or fails
-    return response.statusCode == 200;
-  }
+  // Future<bool> importTranslationMemoryFile(File file,
+  //     {String? name,
+  //     String? subject,
+  //     bool private = false,
+  //     Uri? sourceUrl,
+  //     Uri? targetUrl}) async {
+  //   if (private && key == null) {
+  //     throw TranslationApiException("cannot use key because it is null");
+  //   }
+  //
+  //   var request =
+  //       http.MultipartRequest('POST', Uri.parse('$_baseUrl/v2/tmx/import'));
+  //
+  //   request.files
+  //       .add(http.MultipartFile.fromBytes('tmx', file.readAsBytesSync()));
+  //
+  //   if (name != null) request.fields['name'] = name;
+  //   if (subject != null) request.fields['subj'] = subject;
+  //   if (sourceUrl != null) request.fields['surl'] = sourceUrl.toString();
+  //   if (targetUrl != null) request.fields['turl'] = targetUrl.toString();
+  //   if (key != null) request.fields['key'] = key!;
+  //   request.fields['private'] = _boolToInt(private).toString();
+  //
+  //   request.headers['Content-Type'] = 'multipart/form-data';
+  //
+  //   var sent = await request.send();
+  //   var response = await http.Response.fromStream(sent);
+  //
+  //   if (response.statusCode != 200) {
+  //     throw TranslationApiException('invalid request - ${response.body}');
+  //   }
+  //
+  //   var json = jsonDecode(response.body);
+  //
+  //   if (json['responseStatus'] != 200) {
+  //     throw TranslationApiException(json['responseDetails']);
+  //   }
+  //
+  //   // Should return a valid UUID, but response is empty or fails
+  //   return response.statusCode == 200;
+  // }
 
   int _boolToInt(bool value) {
     return value ? 1 : 0;
