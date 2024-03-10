@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
+import 'package:mymemory_translate/models/translation._response.dart';
 import 'package:mymemory_translate/mymemory_translate.dart';
 import 'package:mymemory_translate/utils/errors.dart';
 import 'package:test/test.dart';
@@ -72,6 +73,7 @@ void main() {
     var result = await myMemoryTranslate.translate('Hello', 'en-us', 'es',
         ip: '0.0.0.0');
 
+    expect(result, isA<TranslationResponse>());
     expect(result.responseData.translatedText, 'Hola');
     expect(result.responseData.match, 1.0);
     expect(result.quotaFinished, false);
@@ -115,6 +117,9 @@ void main() {
   });
 
   test('non-200 status throws exception', () async {
+    when(httpClient.get(any))
+        .thenAnswer((inv) => Future.value(http.Response('', 403)));
+
     expect(
       () async => await myMemoryTranslate.translate('Hello', 'en-us', 'il'),
       throwsA(isA<TranslationApiException>()),

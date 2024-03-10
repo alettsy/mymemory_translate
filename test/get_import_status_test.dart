@@ -37,6 +37,20 @@ var invalidResponse = jsonEncode({
   "responseStatus": 404
 });
 
+var invalidMessageType = jsonEncode({
+  "messageType": "other",
+  "responseData": {
+    "uuid": "123",
+    "id": '1234345646',
+    "creation_date": "2024-03-10 18:42:02",
+    "totals": 3,
+    "completed": 0,
+    "skipped": 0,
+    "status": 2
+  },
+  "responseStatus": 200
+});
+
 void main() {
   MockClient httpClient = MockClient();
   late MyMemoryTranslate myMemoryTranslate;
@@ -98,6 +112,16 @@ void main() {
     expect(
       () async => await myMemoryTranslate.getImportStatus('1234567890'),
       throwsA(isA<http.ClientException>()),
+    );
+  });
+
+  test('invalid messageType throws exception', () {
+    when(httpClient.get(any)).thenAnswer(
+        (inv) => Future.value(http.Response(invalidMessageType, 200)));
+
+    expect(
+      () async => await myMemoryTranslate.getImportStatus('1234567890'),
+      throwsA(isA<TranslationApiException>()),
     );
   });
 }

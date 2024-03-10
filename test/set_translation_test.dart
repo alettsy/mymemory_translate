@@ -84,4 +84,16 @@ void main() {
 
     expect(result, '003c6005-b10c-25db-381a-9d06644bf1c8');
   });
+
+  test('true useKey with not null key succeeds', () async {
+    when(httpClient.get(any)).thenAnswer(
+        (inv) => Future.value(http.Response(successfulResponse, 200)));
+
+    myMemoryTranslate.key = '1234567890';
+
+    var response = await myMemoryTranslate
+        .setTranslation('Hello', 'Hola', 'en-us', 'es', useKey: true);
+
+    expect(response, '003c6005-b10c-25db-381a-9d06644bf1c8');
+  });
 }
