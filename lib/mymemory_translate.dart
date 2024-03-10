@@ -185,7 +185,7 @@ class MyMemoryTranslate {
       throw TranslationApiException('UUID does not point to import');
     }
 
-    return ImportResponseData.fromJson(json);
+    return ImportResponseData.fromJson(json['responseData']);
   }
 
   /// Imports a translation memory [file].
@@ -233,10 +233,6 @@ class MyMemoryTranslate {
 
     request.headers['Content-Type'] = 'multipart/form-data';
 
-    print(request.toString());
-    print(request.files);
-    print(request.fields);
-
     var sent = await request.send();
     var response = await http.Response.fromStream(sent);
 
@@ -250,8 +246,7 @@ class MyMemoryTranslate {
       throw TranslationApiException(json['responseDetails']);
     }
 
-    print(json);
-
+    // Should return a valid UUID, but response is empty or fails
     return response.statusCode == 200;
   }
 
