@@ -236,4 +236,8 @@ Currently accepted languages are as follows:
 
 - The `subjects` endpoint seems to be missing from the API so there is
   no way to get the list of allowed subjects at the moment.
+- The `v2/tmx/import` doesn't appear to work. I have tested it with a
+  HTML/JavaScript application and the result is always that the TMX file
+  is missing. I have left the code in in-case anyone notices a mistake I
+  I have made.
 
