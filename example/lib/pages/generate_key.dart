@@ -1,0 +1,62 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:mymemory_translate/mymemory_translate.dart';
+
+class GenerateKey extends StatefulWidget {
+  const GenerateKey({super.key});
+
+  @override
+  State<GenerateKey> createState() => _GetTranslationState();
+}
+
+class _GetTranslationState extends State<GenerateKey> {
+  var loading = false;
+  var statusText = 'Waiting';
+
+  void generateKey() async {
+    setState(() {
+      loading = true;
+    });
+
+    var translator = MyMemoryTranslate(http.Client());
+    var result = await translator.generateKey('username', 'password');
+
+    setState(() {
+      loading = false;
+      statusText = 'Generated key: $result';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text('Get Translation'),
+        actions: [
+          IconButton(
+            onPressed: () => Get.back(),
+            icon: const Icon(Icons.arrow_back),
+          )
+        ],
+      ),
+      body: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 20),
+            const Text(
+                'Click to generate an example key using "username" and "password"'),
+            ElevatedButton(
+                onPressed: generateKey, child: const Text('Generate Key!')),
+            const SizedBox(height: 20),
+            Text(loading ? 'Loading...' : statusText),
+          ],
+        ),
+      ),
+    );
+  }
+}

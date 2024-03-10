@@ -13,6 +13,7 @@ dependencies:
   mymemory_translate:
     path: ../
   http: ^1.2.1
+  get: ^4.6.6
 
 dev_dependencies:
   flutter_test:
