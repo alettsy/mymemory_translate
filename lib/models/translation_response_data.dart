@@ -1,6 +1,6 @@
 /// The translated text and its match percentage.
 class TranslationResponseData {
-  final String translatedText;
+  final String? translatedText;
   final double? match;
 
   TranslationResponseData(this.translatedText, this.match);

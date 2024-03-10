@@ -32,8 +32,9 @@ class MyMemoryTranslate {
 
   /// Gets the translated [text] input [from] one language [to] another.
   ///
-  /// Returns the response object as a [TranslationResponse]. The translated
-  /// text can be accessed with `myObj.responseData.translatedText`.
+  /// Returns the response object as a [TranslationResponse]. The machine
+  /// translated text can be accessed with `response.responseData.translatedText`.
+  /// Human matches can be accessed with `response.matches`.
   ///
   /// Set [onlyPrivate] to `true` to access your private glossary. A [key] is
   /// required to access your private glossary, which can be generated using the
@@ -187,7 +188,11 @@ class MyMemoryTranslate {
     return ImportResponseData.fromJson(json);
   }
 
-  /// Imports a translation [file] into your private glossary.
+  /// Imports a translation memory [file].
+  ///
+  /// ! ATTENTION: I don't think this endpoint actually works. I have tried to
+  /// test it with a JavaScript application and it always returns an error or
+  /// that the file is missing. Do not use.
   ///
   /// Returns `true` if the import was successful.
   ///
@@ -203,7 +208,7 @@ class MyMemoryTranslate {
   ///
   /// Throws a [TranslationApiException] if [private] is `true` and [key] is
   /// `null`.
-  Future<bool> importTranslationFile(File file,
+  Future<bool> importTranslationMemoryFile(File file,
       {String? name,
       String? subject,
       bool private = false,
@@ -214,10 +219,10 @@ class MyMemoryTranslate {
     }
 
     var request =
-        http.MultipartRequest('POST', Uri.parse('$_baseUrl/v2/import'));
+        http.MultipartRequest('POST', Uri.parse('$_baseUrl/v2/tmx/import'));
 
     request.files
-        .add(http.MultipartFile.fromBytes('file', file.readAsBytesSync()));
+        .add(http.MultipartFile.fromBytes('tmx', file.readAsBytesSync()));
 
     if (name != null) request.fields['name'] = name;
     if (subject != null) request.fields['subj'] = subject;
@@ -226,7 +231,26 @@ class MyMemoryTranslate {
     if (key != null) request.fields['key'] = key!;
     request.fields['private'] = _boolToInt(private).toString();
 
-    var response = await request.send();
+    request.headers['Content-Type'] = 'multipart/form-data';
+
+    print(request.toString());
+    print(request.files);
+    print(request.fields);
+
+    var sent = await request.send();
+    var response = await http.Response.fromStream(sent);
+
+    if (response.statusCode != 200) {
+      throw TranslationApiException('invalid request - ${response.body}');
+    }
+
+    var json = jsonDecode(response.body);
+
+    if (json['responseStatus'] != 200) {
+      throw TranslationApiException(json['responseDetails']);
+    }
+
+    print(json);
 
     return response.statusCode == 200;
   }
