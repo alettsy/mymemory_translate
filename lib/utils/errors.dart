@@ -12,13 +12,13 @@ class EmptyStringError extends Error {
 }
 
 /// The general exception used for any runtime issues encountered by the API.
-class TranslationApiException implements Exception {
+class MyMemoryException implements Exception {
   final String message;
 
-  TranslationApiException(this.message);
+  MyMemoryException(this.message);
 
   @override
   String toString() {
-    return 'TranslationApiException(message: $message)';
+    return 'MyMemoryException(message: $message)';
   }
 }

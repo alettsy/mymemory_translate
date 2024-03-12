@@ -55,7 +55,7 @@ void main() {
 
     expect(
       () async => await myMemoryTranslate.generateKey('username', 'apple'),
-      throwsA(isA<TranslationApiException>()),
+      throwsA(isA<MyMemoryException>()),
     );
   });
 
@@ -75,7 +75,7 @@ void main() {
 
     expect(
       () async => await myMemoryTranslate.generateKey('username', 'apple'),
-      throwsA(isA<TranslationApiException>()),
+      throwsA(isA<MyMemoryException>()),
     );
   });
 }

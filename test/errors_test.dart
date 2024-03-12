@@ -8,7 +8,7 @@ void main() {
   });
 
   test('TranslationApiException.toString()', () {
-    expect(TranslationApiException('text').toString(),
-        'TranslationApiException(message: text)');
+    expect(MyMemoryException('text').toString(),
+        'MyMemoryException(message: text)');
   });
 }

@@ -75,7 +75,7 @@ void main() {
 
     expect(
       () async => await myMemoryTranslate.getImportStatus('123'),
-      throwsA(isA<TranslationApiException>()),
+      throwsA(isA<MyMemoryException>()),
     );
   });
 
@@ -101,7 +101,7 @@ void main() {
 
     expect(
       () async => await myMemoryTranslate.getImportStatus('1234567890'),
-      throwsA(isA<TranslationApiException>()),
+      throwsA(isA<MyMemoryException>()),
     );
   });
 
@@ -121,7 +121,7 @@ void main() {
 
     expect(
       () async => await myMemoryTranslate.getImportStatus('1234567890'),
-      throwsA(isA<TranslationApiException>()),
+      throwsA(isA<MyMemoryException>()),
     );
   });
 }

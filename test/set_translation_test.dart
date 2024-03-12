@@ -40,8 +40,8 @@ void main() {
   test('true useKey with null key throws exception', () {
     expect(
       () async => await myMemoryTranslate
-          .setTranslation('Hello', 'Hola', 'en-us', 'es', useKey: true),
-      throwsA(isA<TranslationApiException>()),
+          .setTranslation('Hello', 'Hola', 'en-us', 'es', private: true),
+      throwsA(isA<MyMemoryException>()),
     );
   });
 
@@ -60,7 +60,7 @@ void main() {
     expect(
       () async => await myMemoryTranslate.setTranslation(
           'Hello', 'Hola', 'en-us', 'es'),
-      throwsA(isA<TranslationApiException>()),
+      throwsA(isA<MyMemoryException>()),
     );
   });
 
@@ -71,7 +71,7 @@ void main() {
     expect(
       () async => await myMemoryTranslate.setTranslation(
           'Hello', 'Hola', 'en-us', 'es'),
-      throwsA(isA<TranslationApiException>()),
+      throwsA(isA<MyMemoryException>()),
     );
   });
 
@@ -92,7 +92,7 @@ void main() {
     myMemoryTranslate.key = '1234567890';
 
     var response = await myMemoryTranslate
-        .setTranslation('Hello', 'Hola', 'en-us', 'es', useKey: true);
+        .setTranslation('Hello', 'Hola', 'en-us', 'es', private: true);
 
     expect(response, '003c6005-b10c-25db-381a-9d06644bf1c8');
   });

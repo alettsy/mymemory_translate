@@ -105,7 +105,7 @@ void main() {
 
     expect(
       () async => await myMemoryTranslate.translate('Hello', 'en-us', 'il'),
-      throwsA(isA<TranslationApiException>()),
+      throwsA(isA<MyMemoryException>()),
     );
   });
 
@@ -122,7 +122,7 @@ void main() {
 
     expect(
       () async => await myMemoryTranslate.translate('Hello', 'en-us', 'il'),
-      throwsA(isA<TranslationApiException>()),
+      throwsA(isA<MyMemoryException>()),
     );
   });
 

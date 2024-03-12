@@ -35,7 +35,7 @@ class MyMemoryTranslate {
   /// translated text can be accessed with `response.responseData.translatedText`.
   /// Human matches can be accessed with `response.matches`.
   ///
-  /// Set [onlyPrivate] to `true` to access your private glossary. A [key] is
+  /// Set [private] to `true` to access your private glossary. A [key] is
   /// required to access your private glossary, which can be generated using the
   /// [generateKey] function.
   ///
@@ -43,11 +43,11 @@ class MyMemoryTranslate {
   ///
   /// Throws an [EmptyStringError] if [text], [from], or [to] are empty strings.
   ///
-  /// Throws a [TranslationApiException] if the API returns an error or the
+  /// Throws a [MyMemoryException] if the API returns an error or the
   /// response status code is not 200.
   Future<TranslationResponse> translate(String text, String from, String to,
       {bool useMachineTranslation = true,
-      bool onlyPrivate = false,
+      bool private = false,
       String? ip}) async {
     if (text.isEmpty || from.isEmpty || to.isEmpty) {
       throw EmptyStringError(
@@ -55,7 +55,7 @@ class MyMemoryTranslate {
     }
 
     var url =
-        '$_baseUrl/get?q=$text&langpair=$from|$to&mt=${_boolToInt(useMachineTranslation)}&onlyprivate=${_boolToInt(onlyPrivate)}';
+        '$_baseUrl/get?q=$text&langpair=$from|$to&mt=${_boolToInt(useMachineTranslation)}&onlyprivate=${_boolToInt(private)}';
 
     if (ip != null) '$url&ip=$ip';
     if (key != null) '$url&key=$key';
@@ -64,13 +64,13 @@ class MyMemoryTranslate {
     var response = await _httpClient.get(Uri.parse(url));
 
     if (response.statusCode != 200) {
-      throw TranslationApiException(response.body);
+      throw MyMemoryException(response.body);
     }
 
     var result = TranslationResponse.fromJson(jsonDecode(response.body));
 
     if (result.responseStatus != 200) {
-      throw TranslationApiException(result.responseDetails);
+      throw MyMemoryException(result.responseDetails);
     }
 
     return result;
@@ -83,7 +83,7 @@ class MyMemoryTranslate {
   /// Throws an [EmptyStringError] if [username] or [password] are empty
   /// strings.
   ///
-  /// Throws a [TranslationApiException] if the API returns an error or the
+  /// Throws a [MyMemoryException] if the API returns an error or the
   /// response status code is not 200.
   Future<String> generateKey(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
@@ -96,13 +96,13 @@ class MyMemoryTranslate {
     var response = await _httpClient.get(Uri.parse(url));
 
     if (response.statusCode != 200) {
-      throw TranslationApiException(response.body);
+      throw MyMemoryException(response.body);
     }
 
     Map<String, dynamic> json = jsonDecode(response.body);
 
     if (json.containsKey('responseDetails')) {
-      throw TranslationApiException(json['responseDetails']);
+      throw MyMemoryException(json['responseDetails']);
     }
 
     var key = json['key'];
@@ -116,16 +116,16 @@ class MyMemoryTranslate {
   ///
   /// Returns the UUID of the newly set translation.
   ///
-  /// If [useKey] is `true` then the translation will only be set in your
+  /// If [private] is `true` then the translation will only be set in your
   /// private glossary. Otherwise, it's visible to everyone.
   ///
-  /// Throws a [TranslationApiException] if the API returns an error or the
+  /// Throws a [MyMemoryException] if the API returns an error or the
   /// response status code is not 200.
   Future<String> setTranslation(
       String source, String target, String from, String to,
-      {bool useKey = false}) async {
-    if (useKey && key == null) {
-      throw TranslationApiException("cannot use key because it is null");
+      {bool private = false}) async {
+    if (private && key == null) {
+      throw MyMemoryException("cannot use key because it is null");
     }
 
     if (source.isEmpty || target.isEmpty || from.isEmpty || to.isEmpty) {
@@ -135,19 +135,19 @@ class MyMemoryTranslate {
 
     var url = '$_baseUrl/set?seg=$source&tra=$target&langpair=$from|$to';
 
-    if (useKey) '$url&key=$key';
+    if (private) '$url&key=$key';
     if (email != null) '$url&de=$email';
 
     var response = await _httpClient.get(Uri.parse(url));
 
     if (response.statusCode != 200) {
-      throw TranslationApiException(response.body);
+      throw MyMemoryException(response.body);
     }
 
     var json = jsonDecode(response.body);
 
     if (int.parse(json['responseStatus'].toString()) != 200) {
-      throw TranslationApiException(json['responseDetails']);
+      throw MyMemoryException(json['responseDetails']);
     }
 
     return json['responseDetails'][0];
@@ -159,7 +159,7 @@ class MyMemoryTranslate {
   ///
   /// Throws an [EmptyStringError] if `uuid` is an empty string.
   ///
-  /// Throws a [TranslationApiException] if the API returns an error or the
+  /// Throws a [MyMemoryException] if the API returns an error or the
   /// response status code is not 200.
   Future<ImportResponseData> getImportStatus(String uuid) async {
     if (uuid.isEmpty) {
@@ -171,17 +171,17 @@ class MyMemoryTranslate {
     var response = await _httpClient.get(Uri.parse(url));
 
     if (response.statusCode != 200) {
-      throw TranslationApiException(response.body);
+      throw MyMemoryException(response.body);
     }
 
     var json = jsonDecode(response.body);
 
     if (int.parse(json['responseStatus'].toString()) != 200) {
-      throw TranslationApiException('UUID not found');
+      throw MyMemoryException('UUID not found');
     }
 
     if (json['messageType'] != 'import') {
-      throw TranslationApiException('UUID does not point to import');
+      throw MyMemoryException('UUID does not point to import');
     }
 
     return ImportResponseData.fromJson(json['responseData']);
@@ -205,7 +205,7 @@ class MyMemoryTranslate {
   /// The [private] parameter can be used to make the translation private or
   /// public. It defaults to being public.
   ///
-  /// Throws a [TranslationApiException] if [private] is `true` and [key] is
+  /// Throws a [MyMemoryException] if [private] is `true` and [key] is
   /// `null`.
   // Future<bool> importTranslationMemoryFile(File file,
   //     {String? name,
