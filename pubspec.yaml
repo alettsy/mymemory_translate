@@ -1,6 +1,6 @@
 name: mymemory_translate
-description: "A simple translation API that uses the MyMemory translate REST API."
-version: 1.0.2
+description: "An API to get and manage translations from the MyMemory translate REST API"
+version: 2.0.0
 homepage: https://github.com/alettsy/mymemory_translate
 repository: https://github.com/alettsy/mymemory_translate
 
