@@ -12,7 +12,7 @@ In your Flutter project add the dependency:
 
 ```yaml
 dependencies:
-    mymemory_translate: ^1.0.0
+    mymemory_translate: ^2.0.0
 ```
 
 or run `flutter pub add mymemory_translate`.
@@ -31,7 +31,7 @@ void main() async {
   var result = await translator.translate('Hello', 'en-us', 'de');
   
   // Prints "Hallo"
-  print(result);
+  print(result.responseData.translatedText);
   
   // You can set your email to get 50,000 characters per day
   // instead of only 5,000.
@@ -39,7 +39,7 @@ void main() async {
 }
 ```
 
-### Generate API Key
+### Generating an API Key
 
 ```dart
 void main() async {
@@ -53,14 +53,14 @@ void main() async {
   
   // Now you can access your private glossary
   // For example, to get translations only from your private glossary
-  var result = await translator.translate('Hello', 'en-us', 'de', onlyPrivate: true);
+  var result = await translator.translate('Hello', 'en-us', 'de', private: true);
 
   // Or to set a translation in your private glossary
-  await translator.setTranslation('Hello', 'Hallo', 'en-us', 'de', useKey: true);
+  await translator.setTranslation('Hello', 'Hallo', 'en-us', 'de', private: true);
 }
 ```
 
-### Set Translations
+### Setting Translations
 ```dart
 void main() async {
 
@@ -118,7 +118,8 @@ Currently accepted languages are as follows:
   "Danish": "da-DK",
   "Dutch": "nl-NL",
   "Dzongkha": "dz-BT",
-  "English": "en-GB",
+  "English (UK)": "en-GB",
+  "English (US)": "en-US",
   "Esperanto": "eo-EU",
   "Estonian": "et-EE",
   "Fanagalo": "fn-FNG",
@@ -236,8 +237,7 @@ Currently accepted languages are as follows:
 
 - The `subjects` endpoint seems to be missing from the API so there is
   no way to get the list of allowed subjects at the moment.
-- The `v2/tmx/import` doesn't appear to work. I have tested it with a
-  HTML/JavaScript application and the result is always that the TMX file
+- The `v2/tmx/import` endpoint doesn't appear to work. I have tested it with
+  a HTML/JavaScript application and the result is always that the TMX file
   is missing. I have left the code in in-case anyone notices a mistake I
   I have made.
-
