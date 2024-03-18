@@ -241,3 +241,7 @@ Currently accepted languages are as follows:
   a HTML/JavaScript application and the result is always that the TMX file
   is missing. I have left the code in in-case anyone notices a mistake I
   I have made.
+
+## Disclaimer
+
+I am not affiliated with MyMemory or Translated; I just made this as I saw there was no API to interact with these services in Flutter/Dart.
